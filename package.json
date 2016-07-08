@@ -4,7 +4,7 @@
     "installable": true,
     "main": "file-server-client.js",
     "dependencies": {
-        "msda-clients-error-codes": "0.0.1",
+        "gl-clients-error-codes": "0.0.1",
         "request": "2.72.0"
     },
     "maintainers": [
