@@ -1,0 +1,23 @@
+{
+    "name": "gl-file-server-client",
+    "version": "0.0.1",
+    "installable": true,
+    "main": "file-server-client.js",
+    "dependencies": {
+        "msda-clients-error-codes": "0.0.1",
+        "request": "2.72.0"
+    },
+    "maintainers": [
+        {
+            "name": "and1gio",
+            "email": "g.maisuradze88@gmail.com"
+        },
+        {
+            "name": "levansuper",
+            "email": "l.basharuli@gmail.com"
+        }
+    ],
+    "author": {
+        "name": "Giorgi Maisuradze"
+    }
+}
