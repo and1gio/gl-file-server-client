@@ -1,8 +1,6 @@
 # gl-file-server-client
 
-# File Server Client
-
-# config
+#### config
 
 ```javascript
 var FileServerClient = require("gl-file-server-client");
@@ -14,8 +12,8 @@ var fsc = new FileServerClient({
 });
 ```
 
-# save file 
-### to save file you need to have a stream
+#### save file 
+** to save file you need to have a stream **
 
 ```javascript
 var fs = require("fs");
@@ -28,10 +26,11 @@ fsc.saveFile(stream, "myOtherPrivateKey", function(err, res) {
 ```
 
 
-# get file 
+#### get file 
+
+``` key ``` ** is optional **
 
 ```javascript
-//@key is optional
 fsc.getFile({fileId: "55d3081a6681352f129872b7", key: "myOtherPrivateKey"}, function(err, res) {
     if (err) {
         console.log(err);
@@ -41,9 +40,11 @@ fsc.getFile({fileId: "55d3081a6681352f129872b7", key: "myOtherPrivateKey"}, func
 });
 ```
 
-# get cropped image 
+#### get cropped image 
+
+** before cropping you need to add permitted resolutions: **
+
 ```javascript
-//before cropping you need to add permitted resolutions:
 fsc.addPermittedResolution(500, 1000);
 fsc.addPermittedResolution(1000, null);
 fsc.addPermittedResolution(null, 500);
@@ -64,9 +65,10 @@ function(err, res) {
 });
 ```
 
-## permitted crops in get image:
+#### permitted crops in get image:
 
-```javascript
+```JSON
+{
     "Top Left"      : "TL",
     "Top Center"    : "TC",
     "Top Right"     : "TR",
@@ -76,10 +78,10 @@ function(err, res) {
     "Bottom Left"   : "BL",
     "Bottom Center" : "BC",
     "Bottom Right"  : "BR"
-
+}
 ```
 
-you can call getFile and getImage as with a file if as a first parameter if you don't need the key
+** you can call getFile and getImage as with a file if as a first parameter if you don't need the key **
 
 ```javascript
 fsc.getFile("55d3081a6681352f129872b7", function(err, res) {
