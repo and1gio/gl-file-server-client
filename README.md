@@ -13,7 +13,7 @@ var fsc = new FileServerClient({
 ```
 
 #### save file 
-** to save file you need to have a stream **
+**to save file you need to have a stream**
 
 ```javascript
 var fs = require("fs");
@@ -28,7 +28,7 @@ fsc.saveFile(stream, "myOtherPrivateKey", function(err, res) {
 
 #### get file 
 
-``` key ``` ** is optional **
+``` key ``` **is optional**
 
 ```javascript
 fsc.getFile({fileId: "55d3081a6681352f129872b7", key: "myOtherPrivateKey"}, function(err, res) {
@@ -42,7 +42,7 @@ fsc.getFile({fileId: "55d3081a6681352f129872b7", key: "myOtherPrivateKey"}, func
 
 #### get cropped image 
 
-** before cropping you need to add permitted resolutions: **
+**before cropping you need to add permitted resolutions:**
 
 ```javascript
 fsc.addPermittedResolution(500, 1000);
@@ -81,7 +81,7 @@ function(err, res) {
 }
 ```
 
-** you can call getFile and getImage as with a file if as a first parameter if you don't need the key **
+**you can call getFile and getImage as with a file if as a first parameter if you don't need the key**
 
 ```javascript
 fsc.getFile("55d3081a6681352f129872b7", function(err, res) {
