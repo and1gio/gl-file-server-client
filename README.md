@@ -1,6 +1,6 @@
 # gl-file-server-client
 
-#### config
+### config
 
 ```javascript
 var FileServerClient = require("gl-file-server-client");

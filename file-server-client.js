@@ -1,7 +1,11 @@
+// TODO have to replace with gl-api-request-helper
 var http = require('http');
 var request = require('request');
+// TODO end
+
 var error = require('gl-clients-error-codes');
 
+// TODO this must be set by config
 request.debug = false;
 
 var Manager = function (config) {
