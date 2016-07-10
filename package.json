@@ -1,7 +1,6 @@
 {
     "name": "gl-file-server-client",
     "version": "0.0.1",
-    "installable": true,
     "main": "file-server-client.js",
     "dependencies": {
         "gl-clients-error-codes": "0.0.1",
