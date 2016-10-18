@@ -1,9 +1,7 @@
-// TODO have to replace with gl-api-request-helper
+// TODO have to replace with z-api-request-helper
 var http = require('http');
 var request = require('request');
 // TODO end
-
-var error = require('gl-clients-error-codes');
 
 // TODO this must be set by config
 request.debug = false;
@@ -43,7 +41,7 @@ manager.get = function (method, data, cb) {
         cb(null, {stream: res});
     });
     req.on('error', function (e) {
-        cb(error('CONNECTION_ERROR', e), null);
+        cb([{keyword: 'CONNECTION_ERROR', error: e}], null);
     });
     req.write(postData);
     req.end();
@@ -62,11 +60,11 @@ manager.send = function (method, data, cb) {
 manager.handleSendResponse = function (fnError, response, body, callback) {
     var me = this;
     if (fnError) {
-        return callback(error('CONNECTION_ERROR', fnError), null);
+        return callback([{keyword: 'CONNECTION_ERROR', error: fnError}], null);
     }
     var respBody = JSON.parse(body);
     if (!respBody || !respBody.result) {
-        return callback(error('CONNECTION_ERROR', {message: "response body is null"}), null);
+        return callback([{keyword: 'CONNECTION_ERROR', error: {message: "response body is null"}}], null);
     }
     if (respBody.error) {
         return callback(respBody.error, null);
@@ -128,11 +126,11 @@ manager.getImage = function (fileConf, options, cb) {
     }
 
     if ((options.width || options.height) && !me.isResolutionPermitted(options.width, options.height)) {
-        return cb(error('RESOLUTION_NOT_PERMITTED', null), null);
+        return cb([{keyword: 'RESOLUTION_NOT_PERMITTED'}], null);
     }
 
     if (options.crop && !me.supportedCrops[options.crop]) {
-        return cb(error('UNSUPPORTED_CROP_PLACEMENT', null), null);
+        return cb([{keyword: 'UNSUPPORTED_CROP_PLACEMENT'}], null);
     }
 
     for (var i in options) {

@@ -3,7 +3,7 @@
 ### config
 
 ```javascript
-var FileServerClient = require("gl-file-server-client");
+var FileServerClient = require("z-file-server-client");
 var fsc = new FileServerClient({
     host: 'fs.msda.ge',
     port: '80',

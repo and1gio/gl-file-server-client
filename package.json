@@ -1,10 +1,8 @@
 {
     "name": "gl-file-server-client",
     "version": "0.0.1",
-    "main": "file-server-client.js",
-    "dependencies": {
-        "gl-clients-error-codes": "0.0.1",
-        "request": "2.72.0"
+    "author": {
+        "name": "Giorgi Maisuradze"
     },
     "maintainers": [
         {
@@ -16,7 +14,8 @@
             "email": "l.basharuli@gmail.com"
         }
     ],
-    "author": {
-        "name": "Giorgi Maisuradze"
-    }
+    "dependencies": {
+        "request": "2.72.0"
+    },
+    "main": "z-file-server-client.js"
 }
