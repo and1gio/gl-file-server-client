@@ -13,16 +13,38 @@ var fsc = new FileServerClient({
 ```
 
 #### save file 
-**to save file you need to have a stream**
+**to save file : stream**
 
 ```javascript
 var fs = require("fs");
 var fileName = "header.png";
 var stream = fs.createReadStream(fileName);
+
+var metaData = {
+    originalName: "header.png",
+    mimeType: "image/png",
+    size: 2096
+};
+
 //@key is optional
-fsc.saveFile(stream, "myOtherPrivateKey", function(err, res) {
+fsc.saveStream(stream, "myOtherPrivateKey", metaData, function(err, res) {
    console.log(err, res);
 });
+```
+
+**to save file : file**
+
+```javascript
+var fs = require("fs");
+
+var file = req.file;
+
+//@key is optional
+fsc.saveFile(file, "myOtherPrivateKey", function(err, res) {
+   console.log(err, res);
+});
+
+fs.unlinkSync(file.path);
 ```
 
 

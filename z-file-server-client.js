@@ -1,6 +1,7 @@
 // TODO have to replace with z-api-request-helper
 var http = require('http');
 var request = require('request');
+var fs = require("fs");
 // TODO end
 
 // TODO this must be set by config
@@ -13,7 +14,7 @@ var Manager = function (config) {
 
 var manager = Manager.prototype;
 
-manager.get = function (method, data, cb) {
+manager.getFileStream = function (method, data, cb) {
     var me = this;
     var conf = me.config;
     var postData = JSON.stringify(data);
@@ -27,6 +28,7 @@ manager.get = function (method, data, cb) {
             'Content-Length': Buffer.byteLength(postData)
         }
     };
+
     var req = http.request(options, function (res) {
         if (res.statusCode !== 200) {
             var data = "";
@@ -40,6 +42,7 @@ manager.get = function (method, data, cb) {
         }
         cb(null, {stream: res});
     });
+
     req.on('error', function (e) {
         cb([{keyword: 'CONNECTION_ERROR', error: e}], null);
     });
@@ -50,57 +53,133 @@ manager.get = function (method, data, cb) {
 manager.send = function (method, data, cb) {
     var me = this;
     var conf = me.config;
-    var ApiUrl = "http://" + conf.host + ":" + conf.port + conf.path + method;
-    var reqObj = {url: ApiUrl, formData: data};
+    var apiUrl = "http://" + conf.host + ":" + conf.port + conf.path + method;
+
+    var reqObj = {url: apiUrl, formData: data};
     request.post(reqObj, function (error, response, body) {
-        me.handleSendResponse(error, response, body, cb);
+        me.handleFormDataResponse(error, response, body, cb);
     });
 };
 
-manager.handleSendResponse = function (fnError, response, body, callback) {
+manager.post = function (method, data, cb) {
     var me = this;
+    var conf = me.config;
+    var apiUrl = "http://" + conf.host + ":" + conf.port + conf.path + method;
+
+    var reqObj = {url: apiUrl, json: data};
+    request.post(reqObj, function (error, response, body) {
+        me.handleJsonResponse(error, response, body, cb);
+    });
+};
+
+manager.handleFormDataResponse = function (fnError, response, body, callback) {
+    var me = this;
+
     if (fnError) {
         return callback([{keyword: 'CONNECTION_ERROR', error: fnError}], null);
     }
+
     var respBody = JSON.parse(body);
+
     if (!respBody || !respBody.result) {
         return callback([{keyword: 'CONNECTION_ERROR', error: {message: "response body is null"}}], null);
     }
-    if (respBody.error) {
-        return callback(respBody.error, null);
+
+    if (respBody.result.error) {
+        return callback(respBody.result.error, null);
     }
+
     callback(null, respBody.result.data);
 };
 
-manager.saveFile = function (stream, key, cb) {
+manager.handleJsonResponse = function (fnError, response, body, callback) {
     var me = this;
-    var callBack;
-    var keyWord;
 
-    if (!cb) {
-        callBack = key;
-        keyWord = me.config.key;
-    } else {
-        callBack = cb;
-        keyWord = key;
+    if (fnError) {
+        return callback([{keyword: 'CONNECTION_ERROR', error: fnError}], null);
     }
+
+    var respBody = body;
+
+    if (!respBody || !respBody.result) {
+        return callback([{keyword: 'CONNECTION_ERROR', error: {message: "response body is null"}}], null);
+    }
+
+    if (respBody.result.error) {
+        return callback(respBody.result.error, null);
+    }
+
+    callback(null, respBody.result.data);
+};
+
+manager.saveStream = function (stream, key, metadata, cb) {
+    var me = this;
+    var callback = cb;
+    var keyword = key || me.config.key;
 
     var p = {
         file: stream
     };
 
-    if (keyWord) {
-        p.key = keyWord;
+    if (metadata.originalName) {
+        p.originalName = metadata.originalName;
     }
 
-    me.send("FilesSaveFile", p, function (err, res) {
-        return callBack(err, res);
+    if (metadata.mimeType) {
+        p.mimeType = metadata.mimeType;
+    }
+
+    if (metadata.size) {
+        p.size = metadata.size;
+    }
+
+    if (keyword) {
+        p.key = keyword;
+    }
+
+    me.send("file/save", p, function (err, res) {
+        return callback(err, res);
     });
+};
+
+manager.saveFile = function (file, key, cb) {
+    var me = this;
+    var callback = cb;
+    var keyword = key || me.config.key;
+
+    var stream = fs.createReadStream(file.path);
+
+    var p = {
+        file: stream
+    };
+
+    if (file.originalname) {
+        p.originalName = file.originalname;
+    }
+
+    if (file.mimetype) {
+        p.mimeType = file.mimetype;
+    }
+
+    if (file.size) {
+        p.size = file.size;
+    }
+
+    if (keyword) {
+        p.key = keyword;
+    }
+
+    me.send("file/save", p, function (err, res) {
+        return callback(err, res);
+    });
+
+    fs.unlinkSync(file.path);
 };
 
 manager.getFile = function (fileConf, cb) {
     var me = this;
     var p = {};
+
     if (typeof fileConf === "string") {
         p.fileId = fileConf;
         p.key = me.config.key;
@@ -108,8 +187,17 @@ manager.getFile = function (fileConf, cb) {
         p.fileId = fileConf.fileId;
         p.key = fileConf.key || me.config.key;
     }
-    me.get("FilesGetFile", p, function (err, res) {
-        return cb(err, res);
+
+    me.post("file/get/meta", p, function (err, metaData) {
+        if(err){
+            return cb([{keyword: 'FAILED_TO_GET_FILE_META_INFO'}], null);
+        }
+        me.getFileStream("file/get", p, function (err, res) {
+            if(err){
+                return cb([{keyword: 'FAILED_TO_GET_FILE_FROM_STORAGE'}], null);
+            }
+            return cb(null, {stream: res.stream, metaData: metaData});
+        });
     });
 };
 
@@ -137,7 +225,7 @@ manager.getImage = function (fileConf, options, cb) {
         p[i] = options[i];
     }
 
-    me.get("FilesGetImage", p, function (err, res) {
+    me.getFileStream("file/get/image", p, function (err, res) {
         return cb(err, res);
     });
 };
