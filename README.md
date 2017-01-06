@@ -23,6 +23,7 @@ var stream = fs.createReadStream(fileName);
 var metaData = {
     originalName: "header.png",
     mimeType: "image/png",
+    encoding: "utf-8",
     size: 2096
 };
 
