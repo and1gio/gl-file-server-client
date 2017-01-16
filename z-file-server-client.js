@@ -33,7 +33,7 @@ function Manager(config) {
         };
 
         if (metadata.originalName) {
-            params.originalName = metadata.originalName;
+            params.originalName = new Buffer(metadata.originalName).toString('base64');
         }
 
         if (metadata.mimeType) {
@@ -68,7 +68,7 @@ function Manager(config) {
         };
 
         if (file.originalname) {
-            params.originalName = file.originalname;
+            params.originalName = new Buffer(file.originalname).toString('base64');
         }
 
         if (file.mimetype) {
@@ -109,6 +109,7 @@ function Manager(config) {
             if(err){
                 return cb([{keyword: 'FAILED_TO_GET_FILE_FROM_STORAGE'}], null);
             }
+            res.metaData.originalName = (new Buffer(res.metaData.originalName, "base64")).toString();
             return cb(null, {stream: res.stream, metaData: res.metaData});
         });
     };
@@ -226,7 +227,7 @@ function Manager(config) {
         });
         req.write(postData);
         req.end();
-    };
+    }
 
     function postFormData(method, data, cb) {
         var conf = scope.config;
@@ -236,7 +237,7 @@ function Manager(config) {
         request.post(reqObj, function (error, response, body) {
             handleResponse__formData(error, response, body, cb);
         });
-    };
+    }
 
     function postJSON(method, data, cb) {
         var conf = scope.config;
@@ -246,7 +247,7 @@ function Manager(config) {
         request.post(reqObj, function (error, response, body) {
             handleResponse__JSON(error, response, body, cb);
         });
-    };
+    }
 
     function handleResponse__formData(fnError, response, body, callback) {
         if (fnError) {
@@ -264,7 +265,7 @@ function Manager(config) {
         }
 
         callback(null, respBody.result.data);
-    };
+    }
 
     function handleResponse__JSON(fnError, response, body, callback) {
         if (fnError) {
@@ -282,7 +283,8 @@ function Manager(config) {
         }
 
         callback(null, respBody.result.data);
-    };
+    }
+
 }
 
-module.exports = Manager
+module.exports = Manager;
