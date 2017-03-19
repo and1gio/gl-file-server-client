@@ -1,6 +1,6 @@
 {
     "name": "z-file-server-client",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": {
         "name": "Giorgi Maisuradze"
     },
@@ -15,7 +15,7 @@
         }
     ],
     "dependencies": {
-        "request": "2.72.0"
+        "request": "2.81.0"
     },
     "main": "z-file-server-client.js"
 }
