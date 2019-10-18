@@ -88,10 +88,10 @@ function Manager(config) {
         }
 
         postFormData("file/save", params, function (err, res) {
+            fs.unlinkSync(file.path);
             return callback(err, res);
         });
 
-        fs.unlinkSync(file.path);
     };
 
     this.getFile = function (fileConf, cb) {
